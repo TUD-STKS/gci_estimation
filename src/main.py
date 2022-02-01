@@ -10,11 +10,14 @@ import logging
 from joblib import dump, load
 from scipy.stats import uniform
 from sklearn.utils.fixes import loguniform
+import numpy as np
 
 from pyrcn.echo_state_network import ESNRegressor
 from pyrcn.model_selection import SequentialSearchCV
 from pyrcn.metrics import matthews_corrcoef
+from sklearn.linear_model import Ridge
 from sklearn.model_selection import RandomizedSearchCV
+from sklearn.neural_network import MLPRegressor
 from sklearn.metrics import make_scorer
 
 from src.file_handling import get_file_list, train_test_split
@@ -26,7 +29,8 @@ import matplotlib.pyplot as plt
 LOGGER = logging.getLogger(__name__)
 
 
-def main(plot=False, serialize=False):
+def main(fit_ridge=False, fit_mlp=False, fit_esn=False, plot=False,
+         serialize=False):
     """
     This is the main function to reproduce all visualizations and models for
     the paper "Glottal Closure Instant Detection using Echo State Networks".
@@ -35,6 +39,12 @@ def main(plot=False, serialize=False):
 
     Params
     ------
+    fit_ridge : bool, default=False
+        Fit ridge regression models.
+    fit_mlp : bool, default=False
+        Whether to fit MLP models.
+    fit_esn : bool, default=False
+        Whether to fit ESN models.
     plot : bool, default=False
         Plot a reference and estimated GCI output.
     serialize:
@@ -50,18 +60,38 @@ def main(plot=False, serialize=False):
     LOGGER.info("... done!")
 
     LOGGER.info("Selecting input feature set...")
-    feature_extraction_params = {"sr": 4000., "frame_length": 8}
+    feature_extraction_params = {"sr": 4000., "frame_length": 81}
     X_train, X_test, y_train, y_test = extract_features(
         training_files, test_files, target_widening=True,
         **feature_extraction_params)
     LOGGER.info("... done!")
 
-    try:
-        LOGGER.info("Attempting to load a pre-trained model...")
-        model = load("../results/model.joblib")
-    except FileNotFoundError:
-        LOGGER.info("... No model serialized yet.")
-        LOGGER.info("Fitting a new model...")
+    if fit_ridge:
+        LOGGER.info("Fit Ridge regression models...")
+        model = RandomizedSearchCV(estimator=Ridge(),
+                                   param_distributions={
+                                       'alpha': loguniform(1e-5, 1e1)},
+                                   n_iter=20, scoring="neg_mean_squared_error",
+                                   n_jobs=3, random_state=42).fit(
+            np.concatenate(X_train), np.concatenate(y_train))
+        if serialize:
+            dump(model, f"../results/ridge_"
+                 f"{feature_extraction_params['frame_length']}.joblib")
+        LOGGER.info("... done!")
+
+    if fit_mlp:
+        LOGGER.info("Fit MLP regression models...")
+        model = RandomizedSearchCV(estimator=MLPRegressor(random_state=42),
+                                   param_distributions={}, n_iter=20,
+                                   n_jobs=-1, random_state=42).fit(
+            np.concatenate(X_train), np.concatenate(y_train))
+        if serialize:
+            dump(model, f"../results/mlp_"
+                 f"{feature_extraction_params['frame_length']}.joblib")
+        LOGGER.info("... done!")
+
+    if fit_esn:
+        LOGGER.info("Fit ESN regression models...")
         initially_fixed_params = {
             'hidden_layer_size': 50,
             'k_in': X_train[0].shape[1] if X_train[0].shape[1] < 5 else 5,
@@ -98,10 +128,9 @@ def main(plot=False, serialize=False):
         base_esn = ESNRegressor(**initially_fixed_params)
         model = SequentialSearchCV(
             base_esn, searches=searches).fit(X_train, y_train)
-
-    LOGGER.info("... done!")
-    if serialize:
-        dump(model, "../results/model.joblib")
+        LOGGER.info("... done!")
+        if serialize:
+            dump(model, "../results/esn_optimization.joblib")
 
     LOGGER.info("Predicting GCIs on the test set...")
     y_pred = model.predict(X_test)
@@ -123,6 +152,9 @@ def main(plot=False, serialize=False):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
+    parser.add_argument("--fit_ridge", action="store_true")
+    parser.add_argument("--fit_mlp", action="store_true")
+    parser.add_argument("--fit_esn", action="store_true")
     parser.add_argument("--plot", action="store_true")
     parser.add_argument("--serialize", action="store_true")
     args = vars(parser.parse_args())
