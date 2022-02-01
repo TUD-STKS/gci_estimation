@@ -95,7 +95,7 @@ def main(plot=False, serialize=False):
             ('step2', RandomizedSearchCV, step2_esn_params, kwargs_step2),
             ('step3', RandomizedSearchCV, step3_esn_params, kwargs_step3),
             ('step4', RandomizedSearchCV, step4_esn_params, kwargs_step4)]
-        base_esn = ESNRegressor(**initially_fixed_params).fit(X_train, y_train)
+        base_esn = ESNRegressor(**initially_fixed_params)
         model = SequentialSearchCV(
             base_esn, searches=searches).fit(X_train, y_train)
 
