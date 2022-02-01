@@ -1,94 +1,41 @@
-# Template Repository for Research Papers
+# Glottal Closure Instant Detection using Echo State Networks
 ## Metadata
 - Author: [Peter Steiner](mailto:peter.steiner@tu-dresden.de)
-- Conference: Forschungsseminar "Sprache und Kognition", 
-Institute for Acoustics and Speech Communication, Technische Universität Dresden, 
-Dresden, Germany
-- Weblink: [https://github.com/TUD-STKS/TemplateRepository](https://github
-.com/TUD-STKS/TemplateRepository)
+- Conference: Studientexte zur Sprachkommunikation:
+Elektronische Sprachsignalverarbeitung 2021, TUDpress, Dresden, Germany
+- Weblink: [Paper](https://www.vocaltractlab.de/publications/steiner-2021-essv.pdf),
+[This Repository](https://github.com/TUD-STKS/gci_estimation)
 
 ## Summary and Contents
-This is a template repository for code accompanying a research paper and should allow 
-to reproduce the results from the paper.
+This repository provides the code for our experiments about the detection of Glottal 
+Closure Instants (GCI), which are the points in time at which the vocal folds close 
+during the production of voiced speech. So far, this code can be used to train the ESN
+models. Comparisons between the Multilayer Perceptron (MLP), Ridge Regression (RR) and
+ESN models follow.
 
-This template provides everything to getting started. and it can directly be used
-for basically any research paper.
-
-We propose to use the following structure of this README:
-- Title of the paper
-- Metadata:
-    - Metadata contains the author names, journal/conference, weblinks, such as the 
-Digital Object Identifier(DOI)etc.
-- Summary and Contents:
-    - The summary is typically not the abstract of the paper but a summary of what the
-     repo containts.
-     - Take care of the Copyright of the publisher
-- File list:
-    - The file list contains all files provided in the repository together with a 
-    short description.
-- Usage:
-    - How can users get started with your research code. This contains setting up a 
-    installing packages in a virtual environment `venv` and running one `main.py` that
-    includes your main code. 
-    - Very important and often forgotten: How can the data to reproduce the results be
-    obtained?
-    - In case of a Jupyter notebook, it is strongly recommended to add a link to 
-    [Binder](https://mybinder.org/).
-- Acknowledgments:
-    - Any kind of required funding information 
-    - other acknowledgments, such as project partners, contributors, family etc.
-- License:
-    - Reference to the license of your code - how can readers re-use it?
-    - Which defaults?
-- Referencing:
-    - How can your work be cited? Ideally, provide a bibtex entry of the paper.
+Please note that, due to significant updates of the PyRCN library, the results can 
+slightly differ from the reported values in the paper. However, the main conclusions 
+are still the same.
 
 ## File list
 - The following scripts are provided in this repository
     - `scripts/run.sh`: UNIX Bash script to reproduce the Figures in the paper.
-    - `scripts/run_jupyter-lab.sh`: UNIX Bash script to start the Jupyter Notebook for 
-   the paper.
-    - `scripts/run.bat`: Windows batch script to reproduce the Figures in the paper.
-    - `scripts/run_jupyter-lab.bat`: Windows batch script to start the Jupyter Notebook 
-  for the paper.
+    - `scripts/run.ps2`: Windows PowerShell script to reproduce the Figures in the paper.
 - The following python code is provided in `src`
     - `src/file_handling.py`: Utility functions for storing and loading data and models.
-    - `src/preprocessing.py`: Utility functions for preprocessing the dataset
-    - `src/main.py`: The main script to reproduce all results.
-- `requirements.txt`: Text file containing all required Python modules to be installed
-if we are working in Python. It can be obtained by typing 
-`pip freeze > requirements.txt` in a PowerShell or in a Bash. 
+    - `src/preprocessing.py`: Utility functions for preprocessing the dataset.
+    - `src/main.py`: The main script to run.
+- `requirements.txt`: Text file containing all required Python modules to be installed.
 - `README.md`: The README displayed here.
 - `LICENSE`: Textfile containing the license for this source code. You can find 
 - `data/`: The optional directory `data` contains
-    - `train.csv`: Training data as CSV file
-    - `test.csv`: Test data as CSV file
+    - `SpLxDataLondonStudents2008/`: Training and test audio files. Please ask 
+    [Peter Steiner](mailto:peter.steiner@tu-dresden.de) to obtain the dataset.
 - `results/`
     - (Pre)-trained modelss.
-    - Results as CSV file.
-- `.gitignore`: Command file for Github to ignore files with specific extensions. This
-is useful to keep the repository clean. Templates for many programming languages are 
-available [here](https://github.com/github/gitignore).
+- `.gitignore`: Command file for Github to ignore files with specific extensions.
 
 ## Usage
-The easiest way to reproduce the results is to use a service like 
-[Binder](https://mybinder.org/) and run the Jupyter Notebook (if available). It is 
-nowadays highly recommended, because this does not even require a local installation 
-and Jupyter Notebooks are very intuitive to use.
-
-Do not forget to add a badge from Binder as below. Therefore, you can simply paste the
-link to your Github repository [here](https://mybinder.org/) and Binder will do the 
-rest for you.
-
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TUD-STKS/SupplementalCodeTemplate/HEAD?labpath=src%2FExample-Notebook.ipynb)
-
-To run the scripts or to start the Jupyter Notebook locally, at first, please ensure 
-that you have a valid Python distribution installed on your system. Here, at least 
-Python 3.8 is required.
-
-You can then call `run_jupyter-lab.ps1` or `run_jupyter-lab.sh`. This will install a new 
-[Python venv](https://docs.python.org/3/library/venv.html), which is our recommended way 
-of getting started.
 
 To manually reproduce the results, you should create a new Python venv as well.
 Therefore, you can run the script `create_venv.sh` on a UNIX bash or `create_venv.ps1`
@@ -96,17 +43,15 @@ that will automatically install all packages from PyPI. Afterwards, just type
 `source .virtualenv/bin/activate` in a UNIX bash or `.virtualenv/Scripts/activate.ps1`
 in a PowerShell.
 
-The individual steps to reproduce the results should be in the same order as in the 
-paper. Great would be self-explanatory names for each step.
-
 At first, we import required Python modules and load the dataset, which is already 
 stored in `data`. 
 
 ```python
-from file_handling import (load_data)
+from file_handling import get_file_list, train_test_split
 
 
-training_data = load_data("../data/train.csv")
+audio_files = get_file_list("../data/SpLxDataLondonStudents2008/M/")
+training_files, test_files = train_test_split(audio_files)
 ```
 
 Since the data is stored as a Pandas dataframe, we can theoretically multiple features. 
@@ -116,48 +61,67 @@ used for transforming the test data later. Next, we normalize them to zero mean 
 unitary variance.
 
 ```python
-from sklearn.preprocessing import StandardScaler
-from preprocessing import select_features
+from preprocessing import extract_features
 
 
-X, y, feature_trf = select_features(
-    df=training_data, input_features=["GrLivArea"], target="SalePrice")
-scaler = StandardScaler().fit(X)
-X_train = scaler.transform(X)
-y_train = y
+feature_extraction_params = {"sr": 4000., "frame_length": 8}
+X_train, X_test, y_train, y_test = extract_features(
+    training_files, test_files, target_widening=True,
+    **feature_extraction_params)
 ```
 
 We optimize a model using a random search.
 
 ```python
-from sklearn.model_selection import RandomizedSearchCV
-from sklearn.utils.fixes import loguniform
 from scipy.stats import uniform
+from sklearn.utils.fixes import loguniform
 
-from pyrcn.extreme_learning_machine import ELMRegressor
+from pyrcn.echo_state_network import ESNRegressor
+from pyrcn.model_selection import SequentialSearchCV
+from pyrcn.metrics import matthews_corrcoef
+from sklearn.model_selection import RandomizedSearchCV
+from sklearn.metrics import make_scorer
 
 
-model = RandomizedSearchCV(
-    estimator=ELMRegressor(input_activation="relu", random_state=42,
-                           hidden_layer_size=50),
-    param_distributions={"input_scaling": uniform(loc=0, scale=2),
-                         "bias_scaling": uniform(loc=0, scale=2),
-                         "alpha": loguniform(1e-5, 1e1)},
-    random_state=42, n_iter=200, refit=True).fit(X, y)
+initially_fixed_params = {
+    'hidden_layer_size': 50,
+    'k_in': X_train[0].shape[1] if X_train[0].shape[1] < 5 else 5,
+    'input_scaling': 0.4, 'input_activation': 'identity',
+    'bias_scaling': 0.0, 'spectral_radius': 0.0, 'leakage': 1.0,
+    'k_rec': 10, 'reservoir_activation': 'tanh',
+    'bidirectional': False, 'alpha': 1e-3, 'random_state': 42}
+
+step1_esn_params = {'input_scaling': uniform(loc=1e-2, scale=10),
+                    'spectral_radius': uniform(loc=0, scale=2)}
+
+step2_esn_params = {'leakage': uniform(1e-5, 1e0)}
+step3_esn_params = {'bias_scaling': uniform(loc=0, scale=3)}
+step4_esn_params = {'alpha': loguniform(1e-5, 1e1)}
+
+kwargs_step1 = {
+    'n_iter': 200, 'random_state': 42, 'verbose': 1, 'n_jobs': -1,
+    'scoring': make_scorer(matthews_corrcoef)}
+kwargs_step2 = {
+    'n_iter': 50, 'random_state': 42, 'verbose': 1, 'n_jobs': -1,
+    'scoring': make_scorer(matthews_corrcoef)}
+kwargs_step3 = {
+    'n_iter': 50, 'random_state': 42, 'verbose': 1, 'n_jobs': -1,
+    'scoring': make_scorer(matthews_corrcoef)}
+kwargs_step4 = {
+    'n_iter': 50, 'random_state': 42, 'verbose': 1, 'n_jobs': -1,
+    'scoring': make_scorer(matthews_corrcoef)}
+
+searches = [
+    ('step1', RandomizedSearchCV, step1_esn_params, kwargs_step1),
+    ('step2', RandomizedSearchCV, step2_esn_params, kwargs_step2),
+    ('step3', RandomizedSearchCV, step3_esn_params, kwargs_step3),
+    ('step4', RandomizedSearchCV, step4_esn_params, kwargs_step4)]
+base_esn = ESNRegressor(**initially_fixed_params).fit(X_train, y_train)
+model = SequentialSearchCV(
+    base_esn, searches=searches).fit(X_train, y_train)
 ```
 
-We load and transform test data.
-
-```python
-from file_handling import load_data
-
-
-test_data = load_data("../data/test.csv")
-X = feature_trf.transform(test_data)
-X_test = scaler.transform(X)
-```
-
-Finally, we predict the test data.
+Finally, we estimate on the test data.
 
 ```python
 y_pred = model.predict(X_test)
@@ -179,10 +143,12 @@ order to reproduce all results in the paper.
 If you want to suppress any options, simply remove the particular option.
 
 ## Acknowledgements
-This research was supported by
-```
-Nobody
-```
+
+This research was financed by Europäischer Sozialfonds (ESF) and the Free State of Saxony
+(Application number: 100327771).
+
+We thank Adrian Fourcin (University College London, UK) for giving us permission to use
+the EGG dataset.
 
 
 ## License and Referencing
@@ -190,16 +156,17 @@ This program is licensed under the BSD 3-Clause License. If you in any way use t
 code for research that results in publications, please cite our original
 article listed above.
 
-More information about licensing can be found [here](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository)
-and [here](https://en.wikipedia.org/wiki/License).
-
 You can use the following BibTeX entry
-```
-@inproceedings{src:Steiner-22,
-  author    = "Peter Steiner",
-  title     = "Template Repository for Research Papers",
-  booktitle = "Proceedings of the Research Seminar",
-  year      = 2022,
-  pages     = "1--6",
+```latex
+@InProceedings{src:Steiner-21c,
+	title = {Glottal Closure Instant Detection using Echo State Networks},
+	author = {Peter Steiner and Ian S. Howard and Peter Birkholz},
+	year = {2021},
+	pages = {161--168},
+	keywords = {Oral},
+	booktitle = {Studientexte zur Sprachkommunikation: Elektronische Sprachsignalverarbeitung 2021},
+	editor = {Stefan Hillmann and Benjamin Weiss and Thilo Michael and Sebastian Möller},
+	publisher = {TUDpress, Dresden},
+	isbn = {978-3-95908-227-3}
 }
 ```

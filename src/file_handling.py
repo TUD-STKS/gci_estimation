@@ -1,29 +1,19 @@
 """
 File handling utilities required to reproduce the results in the paper
-'Template Repository for Research Papers with Python Code'.
+'Glottal Closure Instant Detection using Echo State Networks'.
 """
 # Authors: Peter Steiner <peter.steiner@tu-dresden.de>,
 # License: BSD 3-Clause
 
-import pandas as pd
-from joblib import dump, load
+import os
 
 
-def load_data(filename):
-    return pd.read_csv(filename)
+def get_file_list(directory):
+    directory = os.path.abspath(directory)
+    return [os.path.join(directory, f) for f in os.listdir(directory)]
 
 
-def export_results(results, filename):
-    """Store the results as a csv file."""
-    df = pd.DataFrame.from_dict(results)
-    df.to_csv(filename, sep=',', index=False)
-
-
-def serialize_model(model, filename):
-    """Store a fitted model in the binary pickle file format."""
-    dump(model, filename=filename)
-
-
-def deserialize_model(filename):
-    """Load a fitted model in the binary pickle file format."""
-    return load(filename)
+def train_test_split(file_list):
+    training_files = file_list[:8]
+    test_files = file_list[8:12]
+    return training_files, test_files
