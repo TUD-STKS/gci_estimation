@@ -11,7 +11,7 @@ This repository provides the code for our experiments about the detection of Glo
 Closure Instants (GCI), which are the points in time at which the vocal folds close 
 during the production of voiced speech. So far, this code can be used to train the 
 different considered models (Ridge Regression, Echo State Network, Multilayer 
-Perceptron). Comparative plots and the noise analysis of the models follow soon.
+Perceptron) and to compute the ROC curves. The noise analysis of the models follows soon.
 
 Please note that, due to significant updates of the PyRCN library, the results can 
 slightly differ from the reported values in the paper. However, the main conclusions 
