@@ -8,6 +8,7 @@ Preprocessing utilities required to reproduce the results in the paper
 import numpy as np
 import librosa
 from scipy.signal import find_peaks
+import csv
 
 
 def binarize_signal(y, thr=0.04):
@@ -26,7 +27,7 @@ def extract_features(training_files: str, test_files: str, sr: float = 4000.,
     y_test = np.empty(shape=(len(test_files)), dtype=object)
     for k, f in enumerate(training_files):
         s, sr = librosa.load(f, sr=sr, mono=False)
-        # s[0, :] = librosa.util.normalize(s[0, :])
+        s[0, :] = librosa.util.normalize(s[0, :])
         X_train[k] = librosa.util.frame(
             s[0, :], frame_length=frame_length, hop_length=1).T
         y_train[k] = librosa.util.frame(
@@ -39,7 +40,7 @@ def extract_features(training_files: str, test_files: str, sr: float = 4000.,
             y_train[k] = y_train[k][:, int(frame_length / 2)].reshape(-1, 1)
     for k, f in enumerate(test_files):
         s, sr = librosa.load(f, sr=sr, mono=False)
-        # s[0, :] = librosa.util.normalize(s[0, :])
+        s[0, :] = librosa.util.normalize(s[0, :])
         X_test[k] = librosa.util.frame(
             s[0, :], frame_length=frame_length, hop_length=1).T
         y_test[k] = librosa.util.frame(

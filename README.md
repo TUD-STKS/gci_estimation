@@ -4,14 +4,14 @@
 - Conference: Studientexte zur Sprachkommunikation:
 Elektronische Sprachsignalverarbeitung 2021, TUDpress, Dresden, Germany
 - Weblink: [Paper](https://www.vocaltractlab.de/publications/steiner-2021-essv.pdf),
-[This Repository](https://github.com/TUD-STKS/gci_estimation)
+[Repository](https://github.com/TUD-STKS/gci_estimation)
 
 ## Summary and Contents
 This repository provides the code for our experiments about the detection of Glottal 
 Closure Instants (GCI), which are the points in time at which the vocal folds close 
-during the production of voiced speech. So far, this code can be used to train the ESN
-models. Comparisons between the Multilayer Perceptron (MLP), Ridge Regression (RR) and
-ESN models follow.
+during the production of voiced speech. So far, this code can be used to train the 
+different considered models (Ridge Regression, Echo State Network, Multilayer 
+Perceptron) and to compute the ROC curves. The noise analysis of the models follows soon.
 
 Please note that, due to significant updates of the PyRCN library, the results can 
 slightly differ from the reported values in the paper. However, the main conclusions 
